@@ -29,7 +29,7 @@ module Geocoder::Result
       return nil # no appropriate components found
     end
 
-    def state
+    def state_name
       if state = address_components_of_type(:administrative_area_level_1).first
         state['long_name']
       end
@@ -40,11 +40,19 @@ module Geocoder::Result
         state['short_name']
       end
     end
+    
+    def state
+      state_code
+    end
 
     def sub_state
       if state = address_components_of_type(:administrative_area_level_2).first
         state['long_name']
       end
+    end
+    
+    def county
+      sub_state.gsub(" County")
     end
 
     def sub_state_code
@@ -69,6 +77,10 @@ module Geocoder::Result
       if postal = address_components_of_type(:postal_code).first
         postal['long_name']
       end
+    end
+    
+    def zip
+      postal_code
     end
 
     def route
@@ -119,6 +131,21 @@ module Geocoder::Result
 
     def precision
       geometry['location_type'] if geometry
+    end
+    
+    def partial_match
+      @data['partial_match']
+    end
+    
+    def place_id
+      @data['place_id']
+    end  
+
+    def viewport
+      viewport = geometry['viewport'] || fail
+      south, west = %w(lat lng).map { |c| viewport['southwest'][c] }
+      north, east = %w(lat lng).map { |c| viewport['northeast'][c] }
+      [south, west, north, east]
     end
   end
 end
