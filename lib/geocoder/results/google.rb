@@ -52,7 +52,7 @@ module Geocoder::Result
     end
     
     def county
-      sub_state.gsub(" County")
+      sub_state.gsub(" County", "")
     end
 
     def sub_state_code
